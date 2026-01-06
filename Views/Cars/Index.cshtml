@@ -7,7 +7,7 @@
 <h1>Nasze samochody</h1>
 @if (User.IsInRole("Admin")){
 <p>
-    <a asp-action="Create">Create New</a>
+    <a asp-action="Create">Dodaj nowe auto</a>
 </p>   
 }
 <table class="table">
@@ -47,14 +47,14 @@
                 @Html.DisplayFor(modelItem => item.PricePerDay)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Office.City)
+                @Html.DisplayFor(modelItem => item.Office.Name)
             </td>
             <td>
                 @if (User.IsInRole("Admin")){
-                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a>
-                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                    <a asp-action="Edit" asp-route-id="@item.Id">Edytuj</a>
+                    <a asp-action="Delete" asp-route-id="@item.Id">Usuń</a>
                 }
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a>
+                <a asp-action="Details" asp-route-id="@item.Id">Szczegóły</a>
             </td>
         </tr>
 }

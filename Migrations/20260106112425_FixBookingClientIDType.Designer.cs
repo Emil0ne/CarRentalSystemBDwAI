@@ -4,6 +4,7 @@ using CarRentalSystem.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CarRentalSystem.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260106112425_FixBookingClientIDType")]
+    partial class FixBookingClientIDType
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -39,9 +42,6 @@ namespace CarRentalSystem.Migrations
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("OfficeId")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("datetime2");
 
@@ -50,8 +50,6 @@ namespace CarRentalSystem.Migrations
                     b.HasIndex("CarId");
 
                     b.HasIndex("ClientId");
-
-                    b.HasIndex("OfficeId");
 
                     b.ToTable("Bookings");
                 });
@@ -348,15 +346,9 @@ namespace CarRentalSystem.Migrations
                         .WithMany()
                         .HasForeignKey("ClientId");
 
-                    b.HasOne("CarRentalSystem.Models.Office", "Office")
-                        .WithMany()
-                        .HasForeignKey("OfficeId");
-
                     b.Navigation("Car");
 
                     b.Navigation("Client");
-
-                    b.Navigation("Office");
                 });
 
             modelBuilder.Entity("CarRentalSystem.Models.Car", b =>

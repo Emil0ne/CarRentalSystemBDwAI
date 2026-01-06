@@ -1,38 +1,49 @@
 ﻿@model CarRentalSystem.Models.Booking
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Edytuj";
+    string minDate = DateTime.Today.ToString("yyyy-MM-dd");
 }
 
-<h1>Edit</h1>
+<h1>Edytuj</h1>
 
-<h4>Booking</h4>
+<h4>Rezerwacja</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
         <form asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
             <input type="hidden" asp-for="Id" />
+            <input type="hidden" asp-for="ClientId" />
+
             <div class="form-group">
                 <label asp-for="StartDate" class="control-label"></label>
-                <input asp-for="StartDate" class="form-control" />
+                <input asp-for="StartDate" class="form-control" type="date" min="@minDate" />
                 <span asp-validation-for="StartDate" class="text-danger"></span>
             </div>
+
             <div class="form-group">
                 <label asp-for="EndDate" class="control-label"></label>
-                <input asp-for="EndDate" class="form-control" />
+                <input asp-for="EndDate" class="form-control" type="date" />
                 <span asp-validation-for="EndDate" class="text-danger"></span>
             </div>
+
+            <div class="form-group">
+                <label class="control-label">Office</label>
+                <select id="officeSelect" name="OfficeId" class="form-control" asp-items="ViewBag.OfficeId">
+                    <option value="">-- Select Office --</option>
+                </select>
+            </div>
+
             <div class="form-group">
                 <label asp-for="CarId" class="control-label"></label>
-                <select asp-for="CarId" class="form-control" asp-items="ViewBag.CarId"></select>
+                <select id="carSelect" asp-for="CarId" class="form-control" disabled>
+                    <option value="">-- Select Office First --</option>
+                </select>
                 <span asp-validation-for="CarId" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="ClientId" class="control-label"></label>
-                <select asp-for="ClientId" class="form-control" asp-items="ViewBag.ClientId"></select>
-                <span asp-validation-for="ClientId" class="text-danger"></span>
-            </div>
+
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />
             </div>
@@ -45,5 +56,44 @@
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        var allCars = @Html.Raw(ViewBag.CarsJson);
+
+        function refreshCarList() {
+            var officeSelect = document.getElementById('officeSelect');
+            var carSelect = document.getElementById('carSelect');
+            var selectedOfficeId = officeSelect.value;
+            var currentCarId = "@(Model?.CarId ?? 0)";
+
+            carSelect.innerHTML = '<option value="">-- Select Car --</option>';
+
+            if (selectedOfficeId) {
+                var filtered = allCars.filter(c => c.officeId == selectedOfficeId);
+
+                if (filtered.length > 0) {
+                    filtered.forEach(function (car) {
+                        var option = document.createElement('option');
+                        option.value = car.id;
+                        option.text = car.text;
+                        if (car.id == currentCarId) {
+                            option.selected = true;
+                        }
+                        carSelect.appendChild(option);
+                    });
+                    carSelect.disabled = false;
+                } else {
+                    carSelect.innerHTML = '<option value="">No cars available</option>';
+                    carSelect.disabled = true;
+                }
+            } else {
+                carSelect.disabled = true;
+            }
+        }
+
+        document.getElementById('officeSelect').addEventListener('change', refreshCarList);
+        window.onload = refreshCarList;
+    </script>
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

@@ -4,11 +4,12 @@
     ViewData["Title"] = "Rezerwacje";
 }
 
-<h1>Rezerwacje</h1>
+<h1>Lista Rezerwacji</h1>
 
 <p>
-    <a asp-action="Create">Create New</a>
+    <a asp-action="Create">Dodaj nową rezerwację</a>
 </p>
+
 <table class="table">
     <thead>
         <tr>
@@ -31,23 +32,38 @@
 @foreach (var item in Model) {
         <tr>
             <td>
-                @Html.DisplayFor(modelItem => item.StartDate)
+                @item.StartDate.ToShortDateString()
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.EndDate)
+                @item.EndDate.ToShortDateString()
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Car.Brand)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Client.FirstName)
-            </td>
-            <td>
-                @if (User.IsInRole("Admin")){
-                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> 
-                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                @if (item.Car != null)
+                {
+                    @item.Car.Brand @: @item.Car.Model
                 }
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a>
+                else
+                {
+                    <span class="text-muted">Brak auta</span>
+                }
+            </td>
+            <td>
+                @if (item.Client != null)
+                {
+                    <strong>@item.Client.Email</strong>
+                }
+                else
+                {
+                    <span class="text-danger">Błąd: Nie załadowano danych klienta</span>
+                }
+            </td>
+            <td>
+                @if (User.IsInRole("Admin"))
+                {
+                    <a asp-action="Edit" asp-route-id="@item.Id">Edytuj</a> @:|
+                    <a asp-action="Delete" asp-route-id="@item.Id">Usuń</a> @:|
+                }
+                <a asp-action="Details" asp-route-id="@item.Id">Szczegóły</a>
             </td>
         </tr>
 }
