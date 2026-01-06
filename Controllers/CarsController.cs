@@ -7,9 +7,11 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using CarRentalSystem.Data;
 using CarRentalSystem.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace CarRentalSystem.Controllers
 {
+    [Authorize]
     public class CarsController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -20,6 +22,7 @@ namespace CarRentalSystem.Controllers
         }
 
         // GET: Cars
+        [AllowAnonymous]
         public async Task<IActionResult> Index()
         {
             var applicationDbContext = _context.Cars.Include(c => c.Office);
@@ -27,6 +30,7 @@ namespace CarRentalSystem.Controllers
         }
 
         // GET: Cars/Details/5
+        [AllowAnonymous]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -46,6 +50,7 @@ namespace CarRentalSystem.Controllers
         }
 
         // GET: Cars/Create
+        [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
             ViewData["OfficeId"] = new SelectList(_context.Offices, "Id", "Name");
@@ -57,6 +62,7 @@ namespace CarRentalSystem.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create([Bind("Id,Brand,Model,Year,PricePerDay,OfficeId")] Car car)
         {
             if (ModelState.IsValid)
@@ -70,6 +76,7 @@ namespace CarRentalSystem.Controllers
         }
 
         // GET: Cars/Edit/5
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -91,6 +98,7 @@ namespace CarRentalSystem.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Brand,Model,Year,PricePerDay,OfficeId")] Car car)
         {
             if (id != car.Id)
@@ -123,6 +131,7 @@ namespace CarRentalSystem.Controllers
         }
 
         // GET: Cars/Delete/5
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -144,6 +153,7 @@ namespace CarRentalSystem.Controllers
         // POST: Cars/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var car = await _context.Cars.FindAsync(id);

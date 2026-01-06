@@ -7,9 +7,12 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using CarRentalSystem.Data;
 using CarRentalSystem.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization.Infrastructure;
 
 namespace CarRentalSystem.Controllers
 {
+    [Authorize]
     public class OfficesController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -20,12 +23,14 @@ namespace CarRentalSystem.Controllers
         }
 
         // GET: Offices
+        [AllowAnonymous]
         public async Task<IActionResult> Index()
         {
             return View(await _context.Offices.ToListAsync());
         }
 
         // GET: Offices/Details/5
+        [AllowAnonymous]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -44,6 +49,7 @@ namespace CarRentalSystem.Controllers
         }
 
         // GET: Offices/Create
+        [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
             return View();
@@ -54,6 +60,7 @@ namespace CarRentalSystem.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create([Bind("Id,Name,City")] Office office)
         {
             if (ModelState.IsValid)
@@ -66,6 +73,7 @@ namespace CarRentalSystem.Controllers
         }
 
         // GET: Offices/Edit/5
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -86,6 +94,7 @@ namespace CarRentalSystem.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Name,City")] Office office)
         {
             if (id != office.Id)
@@ -117,6 +126,7 @@ namespace CarRentalSystem.Controllers
         }
 
         // GET: Offices/Delete/5
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -137,6 +147,7 @@ namespace CarRentalSystem.Controllers
         // POST: Offices/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var office = await _context.Offices.FindAsync(id);
