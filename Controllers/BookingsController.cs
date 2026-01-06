@@ -60,7 +60,8 @@ namespace CarRentalSystem.Controllers
             var carsList = _context.Cars.Select(c => new {
                 id = c.Id,
                 text = c.Brand + " " + c.Model,
-                officeId = c.OfficeId
+                officeId = c.OfficeId,
+                price = c.PricePerDay
             }).ToList();
 
             ViewBag.CarsJson = System.Text.Json.JsonSerializer.Serialize(carsList);
@@ -125,7 +126,8 @@ namespace CarRentalSystem.Controllers
             var carsList = _context.Cars.Select(c => new {
                 id = c.Id,
                 text = c.Brand + " " + c.Model,
-                officeId = c.OfficeId
+                officeId = c.OfficeId,
+                price = c.PricePerDay
             }).ToList();
             ViewBag.CarsJson = System.Text.Json.JsonSerializer.Serialize(carsList);
 

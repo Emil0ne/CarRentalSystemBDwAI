@@ -20,6 +20,7 @@ namespace CarRentalSystem.Models
 
         [Required]
         [Display(Name = "Cena za dobę")]
+        [DisplayFormat(DataFormatString = "{0:0} zł", ApplyFormatInEditMode = false)]
         public decimal PricePerDay { get; set; }
 
         [Display(Name = "ID Oddziału")]

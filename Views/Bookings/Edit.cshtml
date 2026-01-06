@@ -43,6 +43,12 @@
                 </select>
                 <span asp-validation-for="CarId" class="text-danger"></span>
             </div>
+            <div class="form-group">
+                <label class="control-label">Przewidywany koszt całkowity:</label>
+                <div id="totalPriceDisplay" class="form-control" style="background-color: #f8f9fa; font-weight: bold; color: #28a745;">
+                    0 zł
+                </div>
+            </div>
 
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />
@@ -59,38 +65,63 @@
     <script>
         var allCars = @Html.Raw(ViewBag.CarsJson);
 
+        function calculateTotalPrice() {
+            var startDate = new Date(document.querySelector('input[name="StartDate"]').value);
+            var endDate = new Date(document.querySelector('input[name="EndDate"]').value);
+            var carSelect = document.getElementById('carSelect');
+            var selectedCarId = carSelect.value;
+            var display = document.getElementById('totalPriceDisplay');
+
+            if (startDate && endDate && selectedCarId && endDate >= startDate) {
+                // Obliczanie różnicy dni (minimum 1 dzień)
+                var diffTime = Math.abs(endDate - startDate);
+                var diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+
+                // Znajdź cenę wybranego auta w danych JSON
+                var car = allCars.find(c => c.id == selectedCarId);
+                if (car) {
+                    var total = diffDays * car.price;
+                    display.innerText = total + " zł (za " + diffDays + " dni)";
+                }
+            } else {
+                display.innerText = "0 zł";
+            }
+        }
+
         function refreshCarList() {
             var officeSelect = document.getElementById('officeSelect');
             var carSelect = document.getElementById('carSelect');
             var selectedOfficeId = officeSelect.value;
             var currentCarId = "@(Model?.CarId ?? 0)";
 
-            carSelect.innerHTML = '<option value="">-- Select Car --</option>';
+            carSelect.innerHTML = '<option value="">-- Wybierz auto --</option>';
 
             if (selectedOfficeId) {
                 var filtered = allCars.filter(c => c.officeId == selectedOfficeId);
-
                 if (filtered.length > 0) {
                     filtered.forEach(function (car) {
                         var option = document.createElement('option');
                         option.value = car.id;
-                        option.text = car.text;
-                        if (car.id == currentCarId) {
-                            option.selected = true;
-                        }
+                        option.text = car.text + " (" + car.price + " zł/doba)";
+                        if (car.id == currentCarId) option.selected = true;
                         carSelect.appendChild(option);
                     });
                     carSelect.disabled = false;
                 } else {
-                    carSelect.innerHTML = '<option value="">No cars available</option>';
+                    carSelect.innerHTML = '<option value="">Brak aut w tym oddziale</option>';
                     carSelect.disabled = true;
                 }
             } else {
                 carSelect.disabled = true;
             }
+            calculateTotalPrice();
         }
 
         document.getElementById('officeSelect').addEventListener('change', refreshCarList);
+        document.getElementById('carSelect').addEventListener('change', calculateTotalPrice);
+        document.querySelector('input[name="StartDate"]').addEventListener('change', calculateTotalPrice);
+        document.querySelector('input[name="EndDate"]').addEventListener('change', calculateTotalPrice);
+
         window.onload = refreshCarList;
     </script>
     @{
