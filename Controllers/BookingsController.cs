@@ -25,28 +25,37 @@ namespace CarRentalSystem.Controllers
         // GET: Bookings
         public async Task<IActionResult> Index()
         {
-            var bookings = _context.Bookings
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            var query = _context.Bookings
                 .Include(b => b.Car)
-                .Include(b => b.Client);
-            return View(await bookings.ToListAsync());
+                .Include(b => b.Client)
+                .AsQueryable();
+
+            if (!User.IsInRole("Admin"))
+            {
+                query = query.Where(b => b.ClientId == userId);
+            }
+
+            return View(await query.ToListAsync());
         }
 
         // GET: Bookings/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var booking = await _context.Bookings
                 .Include(b => b.Car)
                 .Include(b => b.Client)
                 .FirstOrDefaultAsync(m => m.Id == id);
 
-            if (booking == null)
+            if (booking == null) return NotFound();
+
+            if (!User.IsInRole("Admin") && booking.ClientId != userId)
             {
-                return NotFound();
+                return Forbid();
             }
 
             return View(booking);
