@@ -95,7 +95,7 @@ namespace CarRentalSystem.Controllers
 
             if (booking.EndDate < booking.StartDate)
             {
-                ModelState.AddModelError("EndDate", "Data zakończenia nie może być wcześniejsza niż rozpoczęcia.");
+                ModelState.AddModelError("EndDate", "Data zakończenia nie może być wcześniejsza niż data rozpoczęcia.");
             }
 
             ModelState.Remove("ClientId");
@@ -109,7 +109,14 @@ namespace CarRentalSystem.Controllers
             }
 
             ViewData["OfficeId"] = new SelectList(_context.Offices, "Id", "Name", booking.OfficeId);
-            var carsList = _context.Cars.Select(c => new { id = c.Id, text = c.Brand + " " + c.Model, officeId = c.OfficeId }).ToList();
+
+            var carsList = _context.Cars.Select(c => new {
+                id = c.Id,
+                text = c.Brand + " " + c.Model,
+                officeId = c.OfficeId,
+                price = c.PricePerDay
+            }).ToList();
+
             ViewBag.CarsJson = System.Text.Json.JsonSerializer.Serialize(carsList);
 
             return View(booking);
@@ -158,12 +165,12 @@ namespace CarRentalSystem.Controllers
 
             if (booking.StartDate < DateTime.Today)
             {
-                ModelState.AddModelError("StartDate", "Nie można zmienić rezerwacji na datę z przeszłości.");
+                ModelState.AddModelError("StartDate", "Data rozpoczęcia nie może być wcześniejsza niż dzisiaj.");
             }
 
             if (booking.EndDate < booking.StartDate)
             {
-                ModelState.AddModelError("EndDate", "Data zakończenia nie może być wcześniejsza niż rozpoczęcia.");
+                ModelState.AddModelError("EndDate", "Data zakończenia nie może być wcześniejsza niż data rozpoczęcia.");
             }
 
             ModelState.Remove("Client");
@@ -190,7 +197,14 @@ namespace CarRentalSystem.Controllers
             }
 
             ViewData["OfficeId"] = new SelectList(_context.Offices, "Id", "Name", booking.OfficeId);
-            var carsList = _context.Cars.Select(c => new { id = c.Id, text = c.Brand + " " + c.Model, officeId = c.OfficeId }).ToList();
+
+            var carsList = _context.Cars.Select(c => new {
+                id = c.Id,
+                text = c.Brand + " " + c.Model,
+                officeId = c.OfficeId,
+                price = c.PricePerDay
+            }).ToList();
+
             ViewBag.CarsJson = System.Text.Json.JsonSerializer.Serialize(carsList);
 
             return View(booking);

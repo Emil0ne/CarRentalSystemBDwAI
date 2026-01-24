@@ -22,7 +22,7 @@
 
             <div class="form-group">
                 <label asp-for="EndDate" class="control-label"></label>
-                <input asp-for="EndDate" class="form-control" type="date" />
+                <input asp-for="EndDate" class="form-control" type="date" min="@minDate" />
                 <span asp-validation-for="EndDate" class="text-danger"></span>
             </div>
 
@@ -63,43 +63,59 @@
     <script>
         var allCars = @Html.Raw(ViewBag.CarsJson);
 
-        function calculateTotalPrice() {
-            var startDate = new Date(document.querySelector('input[name="StartDate"]').value);
-            var endDate = new Date(document.querySelector('input[name="EndDate"]').value);
+                function calculateTotalPrice() {
+            var startDateVal = document.querySelector('input[name="StartDate"]').value;
+            var endDateVal = document.querySelector('input[name="EndDate"]').value;
             var carSelect = document.getElementById('carSelect');
             var selectedCarId = carSelect.value;
             var display = document.getElementById('totalPriceDisplay');
 
-            if (startDate && endDate && selectedCarId && endDate >= startDate) {
-                var diffTime = Math.abs(endDate - startDate);
-                var diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+            if (startDateVal && endDateVal && selectedCarId) {
+                var startDate = new Date(startDateVal);
+                var endDate = new Date(endDateVal);
 
-                var car = allCars.find(c => c.id == selectedCarId);
-                if (car) {
-                    var total = diffDays * car.price;
-                    display.innerText = total + " zł (za " + diffDays + " dni)";
+                if (endDate >= startDate) {
+                    var diffTime = Math.abs(endDate - startDate);
+                    var diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+
+                    var car = allCars.find(c => (c.id || c.Id) == selectedCarId);
+
+                    if (car) {
+                        var pricePerDay = car.price || car.Price || 0;
+                        var total = diffDays * pricePerDay;
+                        display.innerText = total + " zł (za " + diffDays + " dni)";
+                    }
+                } else {
+                    display.innerText = "Data końcowa nie może być przed początkową";
                 }
             } else {
                 display.innerText = "0 zł";
             }
         }
 
-        function refreshCarList() {
+                function refreshCarList() {
             var officeSelect = document.getElementById('officeSelect');
             var carSelect = document.getElementById('carSelect');
             var selectedOfficeId = officeSelect.value;
-            var currentCarId = "@(Model?.CarId ?? 0)";
+
+            var currentCarId = carSelect.getAttribute('value') || carSelect.value;
 
             carSelect.innerHTML = '<option value="">-- Wybierz auto --</option>';
 
             if (selectedOfficeId) {
-                var filtered = allCars.filter(c => c.officeId == selectedOfficeId);
+                var filtered = allCars.filter(c => (c.officeId || c.OfficeId) == selectedOfficeId);
                 if (filtered.length > 0) {
                     filtered.forEach(function (car) {
                         var option = document.createElement('option');
-                        option.value = car.id;
-                        option.text = car.text + " (" + car.price + " zł/doba)";
-                        if (car.id == currentCarId) option.selected = true;
+                        var id = car.id || car.Id;
+                        var price = car.price || car.Price || 0;
+
+                        option.value = id;
+                        option.text = (car.text || car.Text) + " (" + price + " zł/doba)";
+
+                        if (id == currentCarId) {
+                            option.selected = true;
+                        }
                         carSelect.appendChild(option);
                     });
                     carSelect.disabled = false;
@@ -110,7 +126,8 @@
             } else {
                 carSelect.disabled = true;
             }
-            calculateTotalPrice();
+
+            setTimeout(calculateTotalPrice, 100);
         }
 
         document.getElementById('officeSelect').addEventListener('change', refreshCarList);

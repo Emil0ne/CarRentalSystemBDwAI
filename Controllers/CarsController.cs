@@ -1,13 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using CarRentalSystem.Data;
+using CarRentalSystem.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using CarRentalSystem.Data;
-using CarRentalSystem.Models;
-using Microsoft.AspNetCore.Authorization;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.ConstrainedExecution;
+using System.Threading.Tasks;
 
 namespace CarRentalSystem.Controllers
 {
@@ -71,7 +72,7 @@ namespace CarRentalSystem.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["OfficeId"] = new SelectList(_context.Offices, "Id", "City", car.OfficeId);
+            ViewData["OfficeId"] = new SelectList(_context.Offices, "Id", "Name", car.OfficeId);
             return View(car);
         }
 
@@ -89,8 +90,7 @@ namespace CarRentalSystem.Controllers
             {
                 return NotFound();
             }
-            ViewData["OfficeId"] = new SelectList(_context.Offices, "Id", "City", car.OfficeId);
-            return View(car);
+            ViewData["OfficeId"] = new SelectList(_context.Offices, "Id", "Name", car.OfficeId); return View(car);
         }
 
         // POST: Cars/Edit/5
